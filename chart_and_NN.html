@@ -1,0 +1,69 @@
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+    
+    // Import the functions you need from the Firebase SDKs
+    import { initializeApp } from "firebase/app";
+    import { getDatabase, ref, onValue } from "firebase/database";
+    
+    // Replace with your Firebase configuration
+    var firebaseConfig = {
+        apiKey: "AIzaSyDPR_A_lbYBtBZ-FkYdzqFqR97NcSpaTNs",
+        authDomain: "gas-array-chart.firebaseapp.com",
+        databaseURL: "https://gas-array-chart-default-rtdb.firebaseio.com",
+        projectId: "gas-array-chart",
+        storageBucket: "gas-array-chart.appspot.com",
+        messagingSenderId: "1050254980851",
+        appId: "1:1050254980851:web:88b8f7e2d241fdb9d6a986",
+        measurementId: "G-C1RWD5JYYB"
+    };
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const dataRef = ref(analytics, '/Ppm_H2');
+    onValue(dataRef, function(snapshot) {
+      var data = snapshot.val();
+      renderChart(data);
+    });
+
+    // Render the data as a chart (using Chart.js as an example)
+    function renderChart(data) {
+      var labels = Object.keys(data);
+      var values = Object.values(data);
+
+      // Create a chart canvas element
+      var canvas = document.createElement('canvas');
+      canvas.id = 'myChart';
+      document.body.appendChild(canvas);
+
+      // Configure and create the chart
+      var ctx = canvas.getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Data',
+            data: values,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+  <h1>Firebase Data Chart Example</h1>
+</body>
+</html>
