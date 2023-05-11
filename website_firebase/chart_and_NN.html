@@ -1,0 +1,191 @@
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MQ Sensor Array Reading</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+	<div class="data-head">Data PPM Gas Array Input Sensor</div>
+    <img src="/website_firebase/Universitas-Negeri-Malang-Logo.png" alt="Description of the image" class="img-logo">
+	<img src="/website_firebase/foto profil beasiswa.jpg" alt="Profile Picture" class="img-profile">
+	<div class="data-container">
+		<div class="data-item">
+			<h2>Ppm_alkohol</h2>
+			<p class="value" id="data3">0;</p>
+		</div>
+		<div class="data-item">
+			<h2>Ppm_Co</h2>
+			<p class="value" id="data4">0</p>
+		</div>
+		<div class="data-item">
+			<h2>Ppm_lpg</h2>
+			<p class="value" id="data5">0;</p>
+		</div>
+		<div class="data-item">
+			<h2>Ppm_H2</h2>
+			<p class="value" id="data6">0</p>
+		</div>
+		<div class="chart-container">
+			<canvas id="data-chart"></canvas>
+		  </div>
+		  <div class="dynamic-label">
+			<label id="dynamic-label">Initial Value</label>
+		  </div>		  
+		<div class="data-item">
+			<h2>Hasil NN 1</h2>
+			<p class="value" id="data0">0;</p>
+		</div>
+		<div class="data-item">
+			<h2>Hasil NN 2</h2>
+			<p class="value" id="data1">0</p>
+		</div>
+		<div class="data-item">
+				<h2>Hasil NN 3</h2>
+				<p class="value" id="data2">0;</p>
+		</div>
+
+	<!-- the scripts for products you want to access must be added-->
+
+	<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+
+	<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	<script type="module">
+	  // Import the functions you need from the SDKs you need
+	  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+	  // TODO: Add SDKs for Firebase products that you want to use
+	  // https://firebase.google.com/docs/web/setup#available-libraries
+
+	  // Your web app's Firebase configuration here (Do not use the existing configuration)
+	  const firebaseConfig = {
+      apiKey: "AIzaSyDPR_A_lbYBtBZ-FkYdzqFqR97NcSpaTNs",
+      authDomain: "gas-array-chart.firebaseapp.com",
+      databaseURL: "https://gas-array-chart-default-rtdb.firebaseio.com",
+      projectId: "gas-array-chart",
+      storageBucket: "gas-array-chart.appspot.com",
+      messagingSenderId: "1050254980851",
+      appId: "1:1050254980851:web:88b8f7e2d241fdb9d6a986",
+      measurementId: "G-C1RWD5JYYB"
+	  };
+
+	  // Initialize Firebase
+	  firebase.initializeApp(firebaseConfig);
+
+	  // getting reference to the database
+	  var database = firebase.database();
+
+	  //getting reference to the data we want
+	  var dataRef0 = database.ref('/Out1_NN');
+	  var dataRef1 = database.ref('/Out2_NN');
+      var dataRef2 = database.ref('/Out3_NN');
+	  var dataRef3 = database.ref('/Ppm_alkohol');
+	  var dataRef4 = database.ref('/Ppm_Co');
+      var dataRef5 = database.ref('/Ppm_lpg');
+	  var dataRef6 = database.ref('/Ppm_H2');
+
+	  //fetch the data
+	  dataRef0.on('value', function(getdata0){
+	  	var NN1 = getdata0.val();
+	  	document.getElementById('data0').innerHTML = NN1 ;
+	  })
+
+	  dataRef1.on('value', function(getdata1){
+	  	var NN2 = getdata1.val();
+	  	document.getElementById('data1').innerHTML = NN2 ;
+	  })
+
+	   dataRef2.on('value', function(getdata2){
+	  	var NN3 = getdata2.val();
+	  	document.getElementById('data2').innerHTML = NN3;
+	  })
+
+	  dataRef3.on('value', function(getdata3){
+	  	var Alk = getdata3.val();
+	  	document.getElementById('data3').innerHTML = Alk ;
+	  })
+
+	   dataRef4.on('value', function(getdata4){
+	  	var Co2 = getdata4.val();
+	  	document.getElementById('data4').innerHTML = Co2;
+	  })
+
+	  dataRef5.on('value', function(getdata5){
+	  	var lpg = getdata5.val();
+	  	document.getElementById('data5').innerHTML = lpg ;
+	  })
+
+	   dataRef6.on('value', function(getdata6){
+	  	var H2 = getdata6.val();
+	  	document.getElementById('data6').innerHTML = H2;
+	  })
+	
+	  const label = document.getElementById('dynamic-label');
+
+	Promise.all([
+  dataRef0.once('value'),
+  dataRef1.once('value'),
+  dataRef2.once('value'),
+  dataRef3.once('value'),
+  dataRef4.once('value'),
+  dataRef5.once('value'),
+  dataRef6.once('value')
+]).then(function (snapshots) {
+  var data0 = snapshots[0].val();
+  var data1 = snapshots[1].val(); 
+  var data2 = snapshots[2].val();
+  var Alk = snapshots[3].val();
+  var Co2 = snapshots[4].val();
+  var lpg = snapshots[5].val();
+  var H2 = snapshots[6].val();
+
+  // Define the labels and data
+  var labels = ['Ppm_alkohol', 'Ppm_Co', 'Ppm_lpg', 'Ppm_H2'];
+  var data = [Alk, Co2, lpg, H2];
+
+  // Define the colors for each data point
+  var colors = ['rgba(0, 123, 255, 0.5)', 'rgba(255, 0, 0, 0.5)', 'rgba(0, 255, 0, 0.5)', 'rgba(255, 255, 0, 0.5)'];
+
+  // Create a chart using the fetched data
+  var chartData = {
+    labels: labels,
+    datasets: [{
+      label: 'Sensor Readings',
+      data: data,
+      backgroundColor: colors,
+      borderColor: colors,
+      borderWidth: 1
+    }]
+  };
+
+  var chartOptions = {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
+
+  var chart = new Chart('data-chart', {
+    type: 'bar',
+    data: chartData,
+    options: chartOptions
+  });
+
+  if (data0 > data1 + data2) {
+    label.innerText = 'Hasil NN :Kategori Parfum Pria';
+  } else if(data1 > data2 + data0){
+    label.innerText ='Hasil NN :Kategori Parfum Wanita';
+  } else if(data0 >data1 + data2){
+	label.innerText ='Hasil NN :Kategori Udara Normal';
+  } else{
+	label.innerText ='Error 404';
+  }
+});
+
+	</script>
+</body>
+</html>
